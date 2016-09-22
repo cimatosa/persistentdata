@@ -13,7 +13,7 @@ before_install:
 - python --version
 
 install:
-- sudo apt-get install libhdf5-dev
+- sudo apt-get install libhdf5-openmpi-dev
 - pip install numpy
 - pip install pytest pytest-cov
 - pip install sqlitedict
