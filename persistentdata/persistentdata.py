@@ -37,6 +37,11 @@ if sys.version_info[0] == 2:
         os_rmdir(path)
     os.rmdir = new_rmdir
     
+    os_rename = os.rename
+    def new_rename(src, dst):
+        os_rename(src, dst)
+    os.rename = new_rename
+    
 
 MAGIC_SIGN = 0xff4a87
 MAGIC_SIGN_NPARRAY = 0xee4a87
@@ -401,9 +406,7 @@ class PersistentDataStructure(object):
         
         self.db[key] = d
         self.db.commit()
-        return self.__class__(name = d['name'], path = os.path.join(self._dirname) , verbose = self.verbose)
-
-            
+        return self.__class__(name = d['name'], path = os.path.join(self._dirname) , verbose = self.verbose)            
         
     def getData(self, key, create_sub_data = False):
         self.need_open()
@@ -539,9 +542,9 @@ class PersistentDataStructure(object):
     def __iter__(self):
         self.need_open()
         db_iter = self.db.__iter__()
-        while True:
-            yield from db_iter
-            return 
+        for k in db_iter:
+            yield k
+        return 
     
     # implements the 'in' statement 
     def __contains__(self, key):

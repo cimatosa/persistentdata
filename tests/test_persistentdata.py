@@ -159,6 +159,82 @@ def test_mp_read_from_sqlite():
         p1.terminate()
         p2.terminate()
         d.terminate()
+        
+def test_from_existing_sub_data_0():
+    base_data = None
+    VERBOSE = 1
+    try:
+        with PDS(name='base', verbose=VERBOSE) as base_data:
+            with base_data.getData(key='sub1', create_sub_data = True) as sub_data:
+                sub_data[10] = 'sub1_10'
+                sub_data[20] = 'sub1_20'
+                with sub_data.getData(key = 'subsub1', create_sub_data = True) as sub_sub_data:
+                    sub_sub_data[100] = 'subsub1_100'
+            
+                # case: non existing key        
+                base_data.setDataFromSubData(key='sub2', subData = sub_data)
+                with base_data['sub2'] as sub2:
+                    assert sub2[10] == sub_data[10]
+                    assert sub2[20] == sub_data[20]
+                    
+                    with sub_data['subsub1'] as sub_sub_data:
+                        with sub2['subsub1'] as subsub2:
+                            sub_sub_data[100] = subsub2[100]
+                # same with set_item
+                base_data['sub2_'] = sub_data
+                with base_data['sub2_'] as sub2:
+                    assert sub2[10] == sub_data[10]
+                    assert sub2[20] == sub_data[20]
+                    
+                    with sub_data['subsub1'] as sub_sub_data:
+                        with sub2['subsub1'] as subsub2:
+                            sub_sub_data[100] = subsub2[100]
+                            
+                
+                # case: already used key
+                base_data['00'] = 0
+                base_data.setDataFromSubData(key='00', subData = sub_data, overwrite=True)
+                with base_data['00'] as sub2:
+                    assert sub2[10] == sub_data[10]
+                    assert sub2[20] == sub_data[20]
+                    
+                    with sub_data['subsub1'] as sub_sub_data:
+                        with sub2['subsub1'] as subsub2:
+                            sub_sub_data[100] = subsub2[100]
+                            
+                # case: already used key and set_item
+                base_data['00_'] = 0
+                base_data['00_'] = sub_data
+                with base_data['00'] as sub2:
+                    assert sub2[10] == sub_data[10]
+                    assert sub2[20] == sub_data[20]
+                    
+                    with sub_data['subsub1'] as sub_sub_data:
+                        with sub2['subsub1'] as subsub2:
+                            sub_sub_data[100] = subsub2[100]
+                            
+                
+                # case: already used key with sub data
+                with base_data.getData(key='s', create_sub_data = True) as s:
+                    s['a'] = 'a'  
+                    s['b'] = 7
+                
+                base_data.setDataFromSubData(key='s', subData = sub_data, overwrite=True)
+                with base_data['s'] as sub2:
+                    assert sub2[10] == sub_data[10]
+                    assert sub2[20] == sub_data[20]
+                    
+                    with sub_data['subsub1'] as sub_sub_data:
+                        with sub2['subsub1'] as subsub2:
+                            sub_sub_data[100] = subsub2[100]                
+                
+                    assert 'a' not in sub2
+                    assert 'b' not in sub2
+                    
+    finally:
+        print()
+        if base_data is not None:
+            base_data.erase()
 
 
 def test_from_existing_sub_data():
@@ -554,17 +630,18 @@ def test_merge_fname_conflict():
         d2.erase()
       
 if __name__ == "__main__":
-    # test_pd()
-    # test_pd_bytes()
-    # test_directory_removal()
-    # test_mp_read_from_sqlite()
+    test_pd()
+    test_pd_bytes()
+    test_directory_removal()
+    test_mp_read_from_sqlite()
+    test_from_existing_sub_data_0()
     test_from_existing_sub_data()
-    # test_remove_sub_data_and_check_len()
-    # test_show_stat()
-    # test_len()
-    # test_clear()
-    # test_not_in()
-    # test_npa()
-    # test_merge()
-    # test_merge_fname_conflict()
+    test_remove_sub_data_and_check_len()
+    test_show_stat()
+    test_len()
+    test_clear()
+    test_not_in()
+    test_npa()
+    test_merge()
+    test_merge_fname_conflict()
     pass
