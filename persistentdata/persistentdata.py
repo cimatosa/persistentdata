@@ -540,8 +540,8 @@ class PersistentDataStructure(object):
         self.need_open()
         db_iter = self.db.__iter__()
         while True:
-            next_item = next(db_iter)
-            yield next_item 
+            yield from db_iter
+            return 
     
     # implements the 'in' statement 
     def __contains__(self, key):
@@ -806,7 +806,8 @@ class PersistentDataStructure_HDF5(object):
                 key = ob.attrs['key'].tostring()
                 if ob.attrs['dump']:
                     key = bf.load(key)
-                yield key             
+                yield key
+        return           
 
     def open(self):
         if not self._is_group:
