@@ -162,7 +162,6 @@ def test_mp_read_from_sqlite():
         
 def test_from_existing_sub_data_0():
     base_data = None
-    VERBOSE = 1
     try:
         with PDS(name='base', verbose=VERBOSE) as base_data:
             with base_data.getData(key='sub1', create_sub_data = True) as sub_data:
@@ -477,7 +476,6 @@ def test_merge():
     d1 = None
     d2 = None
     try:
-
         with PDS(name='d1', verbose=VERBOSE) as d1:
             d1.clear()
             d1['k1'] = 1
