@@ -9,6 +9,7 @@ sys.path = [split(dirname(abspath(__file__)))[0]] + sys.path
 
 from persistentdata.decorators import pd_func_cache
 import time
+from functools import partial
 
 DELTA_T = 2
 
@@ -73,8 +74,18 @@ def test_unknown_kind():
         def a(x):
             pass
     except ValueError as e:
-        print("caught", e)
+        print("caught:", e)
         print("that is ok")
+
+    def a(x,y):
+        pass
+
+    b = partial(a, y=2)
+    try:
+        cached_b = pd_func_cache()(b)
+    except ValueError as e:
+        print("caught:", e)
+        print("this is ok")
 
 if __name__ == "__main__":
     # test_call_dec_f()

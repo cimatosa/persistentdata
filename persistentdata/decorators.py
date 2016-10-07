@@ -10,11 +10,20 @@ def pd_func_cache(db_name=None, db_path='.', kind='sql', subdbkey=None, verbose=
     class pd_func_cache_decorator:
         def __init__(self, func):
             self.func = func
-            self.__name__ = func.__name__
-            self.__doc__ = func.__doc__
+            try:
+                self.__name__ = func.__name__
+            except AttributeError:                  # for example a 'functools.partial' object has no attribute __name__
+                self.__name__ = None
+            try:
+                self.__doc__ = func.__doc__
+            except AttributeError:
+                self.__doc__ = None
             self.verbose = verbose
 
             if db_name is None:
+                if self.__name__ is None:
+                    raise ValueError("can not get db_name from func.__name (__name__ is None)")
+
                 self.db_name = self.__name__
                 if self.verbose > 0:
                     print("db_name ", db_name, "set from func.__name__")
