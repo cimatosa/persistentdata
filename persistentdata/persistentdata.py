@@ -15,7 +15,7 @@ import warnings
 import random
 
 import binfootprint as bf
-import progress
+import progression as progress
 
 try:
     import numpy as np
