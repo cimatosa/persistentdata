@@ -11,6 +11,10 @@ import logging
 import multiprocessing as mp
 import progression as progress
 
+
+DEFAULT_AUTHKEY = 'cache_dec'
+DEFAULT_PORT    = 51215
+
 try:
     import jobmanager as jm
     from jobmanager.jobmanager import log as jm_log
@@ -33,8 +37,8 @@ try:
                      db_path,
                      subdbkey,
                      PDS,
-                     authkey      = 'cache_dec',
-                     port         = 42524,
+                     authkey      = DEFAULT_AUTHKEY,
+                     port         = DEFAULT_PORT,
                      msg_interval = 1):
 
             jm.JobManager_Server.__init__(self,
@@ -261,9 +265,6 @@ def pd_func_cache(db_name=None, db_path='.', kind='sql', subdbkey=None, verbose=
 
             return res
 
-
-
-
         def clear_cache(self):
             with self.PDS(name=self.db_name, path=self.db_path) as db:
                 if self.subdbkey is not None:
@@ -283,5 +284,3 @@ def pd_func_cache(db_name=None, db_path='.', kind='sql', subdbkey=None, verbose=
                     return key in db
 
     return pd_func_cache_decorator
-
-
