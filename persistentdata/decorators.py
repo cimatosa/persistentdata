@@ -9,7 +9,10 @@ from . import PersistentDataStructure_HDF5
 import warnings
 import logging
 import multiprocessing as mp
+import os
 import progression as progress
+
+import datetime
 
 
 DEFAULT_AUTHKEY = 'cache_dec'
@@ -60,7 +63,7 @@ try:
                           nproc,
                           nice,
                           show_statusbar_for_jobs,
-                          show_counter_only):
+                          show_counter_only):               
 
             client = Function_Client(server  = server,
                                      authkey = authkey,
@@ -70,6 +73,17 @@ try:
                                      show_statusbar_for_jobs = show_statusbar_for_jobs,
                                      show_counter_only       = show_counter_only,
                                      use_special_SIG_INT_handler = False)   # maps SIGINT to exit
+
+#             fname = "{}_pid_{}.out".format(datetime.datetime.now().isoformat(), os.getpid())
+#             jml = jm.jobmanager.log
+#             print(jml.name)   
+#             jml.setLevel(logging.DEBUG)
+#             for h in jml.handlers:
+#                 jml.removeHandler(h)
+#             fhandl = logging.FileHandler(fname)
+#             fhandl.setLevel(logging.DEBUG)
+#             jml.addHandler(fhandl)
+            
             client.start()
 
 
@@ -234,7 +248,10 @@ def pd_func_cache(db_name=None, db_path='.', kind='sql', subdbkey=None, verbose=
 
                 for i in range(l):
                     args, kwargs = conv_list_args_kwargs(list_of_args, list_of_kwargs, i)
-                    r = cs.put_arg(args, kwargs)
+                    try:
+                        r = cs.put_arg(args, kwargs)
+                    except ValueError:
+                        continue
                     if r is not None:
                         res[i] = r
 

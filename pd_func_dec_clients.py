@@ -2,6 +2,8 @@ from persistentdata import decorators
 import logging
 import argparse
 import sys
+import datetime
+import os
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='starts additional clients for the persistent data function cache')
@@ -33,22 +35,42 @@ if __name__ == "__main__":
     
     parser.add_argument('--include', '-i',
                         type    = str,
+                        nargs   = '*',
                         default = '',
                         help    = "a path to include in sys.path")
     
     parser.add_argument('--debug',
                         action='store_true',
                         default=False,
-                        help="enable debug mode")
+                        help="enable debug logging mode")
     
+    parser.add_argument('--info',
+                        action='store_true',
+                        default=False,
+                        help="enable info logging mode")
+    
+    parser.add_argument('--logtofile',
+                        action='store_true',
+                        default=False,
+                        help="write log to file")
+       
     args = parser.parse_args()
-    
+        
+    if args.info:
+        decorators.jm_log.setLevel(logging.INFO)
+       
     if args.debug:
         decorators.jm_log.setLevel(logging.DEBUG)
         
-    if args.include != '':
-        sys.path.append(args.include)
+    for i in args.include:
+        sys.path.append(i)
         
+    if args.logtofile:
+        fname = "{}_pid_{}.out".format(datetime.datetime.now().isoformat(), os.getpid())
+        fhandl = logging.FileHandler(fname)
+        fhandl.setLevel(logging.DEBUG)
+        l = logging.getLogger('jobmanager.jobmanager')
+        l.addHandler(fhandl)
     
     decorators.Cache_Server._start_client(server  = args.hostname, 
                                           authkey = args.authkey, 
