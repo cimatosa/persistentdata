@@ -42,14 +42,14 @@ try:
                      PDS,
                      authkey      = DEFAULT_AUTHKEY,
                      port         = DEFAULT_PORT,
-                     msg_interval = 1):
+                     **kwargs_cache_server):
 
             jm.JobManager_Server.__init__(self,
                                           authkey,
                                           const_arg    = {'f': func},
                                           port         = port,
-                                          msg_interval = msg_interval,
-                                          fname_dump   = None)
+                                          fname_dump   = None,
+                                          **kwargs_cache_server)
             self.func = func
             self.db_name = db_name
             self.db_path = db_path
