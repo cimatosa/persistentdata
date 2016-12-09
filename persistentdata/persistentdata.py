@@ -13,9 +13,13 @@ import traceback
 import pickle
 import warnings
 import random
+import traceback
 
 import binfootprint as bf
 import progression as progress
+
+import logging
+log = logging.getLogger(__name__)
 
 try:
     import numpy as np
@@ -49,6 +53,7 @@ MAGIC_SIGN_NPARRAY = 0xee4a87
 TYPE_ORD = 0x00
 TYPE_SUB = 0x01
 TYPE_NPA = 0x02
+TYPE_LOAD_ERR = 0x03
 
 def key_to_str(key, max_len = 255):
     if isinstance(key, (bytearray, bytes)):
@@ -239,6 +244,7 @@ class PersistentDataStructure(object):
         
         sub_c = 0
         npa_c = 0
+        err_c = 0
         
         sub_data_keys = set()
         
@@ -256,6 +262,8 @@ class PersistentDataStructure(object):
             elif t == TYPE_SUB:
                 sub_c += 1
                 sub_data_keys.add(k)
+            elif t == TYPE_LOAD_ERR:
+                err_c += 1
                 
         print("{}:     number of string keys: {}".format(prepend, str_key))
         print("{}:     number of byte   keys: {}".format(prepend, bin_key))
@@ -263,6 +271,7 @@ class PersistentDataStructure(object):
             print("{}:     number of other  keys: {}".format(prepend, oth_key))
         print("{}:     number of subdata: {}".format(prepend, sub_c))
         print("{}:     nparray counter: {}".format(prepend, npa_c))
+        print("{}:     unloadable keys: {}".format(prepend, err_c))
         print()
         sys.stdout.flush()
         if recursive:
@@ -313,7 +322,13 @@ class PersistentDataStructure(object):
         return (key in self) and self.__is_nparray(self.db[key])
     
     def get_value_and_value_type(self, key):
-        v = self.db[key]
+        try:
+            v = self.db[key]
+        except Exception as e:
+            log.warning("could nor load data: {} {}".format(type(e), e))
+            log.info(traceback.format_exc())
+            return TYPE_LOAD_ERR, e
+
         if self.__is_nparray(v):
             return TYPE_NPA, v
         elif self.__is_sub_data(v):
@@ -426,6 +441,8 @@ class PersistentDataStructure(object):
                 if self.verbose > 1:
                     print("return nparray value")
                 return self._loadNPA(v['fname'])
+            elif t == TYPE_LOAD_ERR:
+                raise v
             else:
                 if self.verbose > 1:
                     print("return normal value")
