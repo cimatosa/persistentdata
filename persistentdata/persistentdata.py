@@ -325,7 +325,7 @@ class PersistentDataStructure(object):
         try:
             v = self.db[key]
         except Exception as e:
-            log.warning("could nor load data: {} {}".format(type(e), e))
+            log.warning("could not load data (may NOT cause trouble) due to {} {}".format(type(e), e))
             log.info(traceback.format_exc())
             return TYPE_LOAD_ERR, e
 
