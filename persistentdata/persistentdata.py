@@ -593,7 +593,12 @@ class PersistentDataStructure(object):
                 pds.erase()
         elif t == TYPE_NPA:
             fname = v['fname']
-            os.remove(os.path.join(self._dirname, fname))
+            try:
+                os.remove(os.path.join(self._dirname, fname))
+            except FileNotFoundError:
+                pass
+
+
                 
         del self.db[key]
         self.db.commit()
