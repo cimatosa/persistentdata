@@ -449,7 +449,7 @@ class PersistentDataStructure(object):
                 return v 
         else:
             if not create_sub_data:
-                raise KeyError("key not found\n{}".format(key_to_str(key)))
+                raise KeyError("key not found in PDS ({}, {})\nkey: {}".format(self._path, self._name, key_to_str(key)))
             else:
                 if self.verbose > 1:
                     print("getData key does NOT exists -> create subData")
