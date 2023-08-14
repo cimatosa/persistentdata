@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "persistentdata"
-version = "0.0.1"
+version = "0.1.0"
 description = "A hierarchical persistent data structure with key-value interface."
 authors = ["Richard Hartmann <richard.hartmann@tu-dresden.de>"]
 license = "MIT"
