@@ -1,125 +1,12 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, print_function
 import inspect
-from functools import wraps
 import binfootprint
 from . import PersistentDataStructure
 from . import PersistentDataStructure_HDF5
 
-import warnings
-import logging
 import multiprocessing as mp
-import os
 import progression as progress
 
-import datetime
-
-
-DEFAULT_AUTHKEY = 'cache_dec'
-DEFAULT_PORT    = 51215
-
-try:
-    import jobmanager as jm
-    from jobmanager.jobmanager import log as jm_log
-    HAS_JOBMANAGER = True
-
-    jm_log.setLevel(logging.WARNING)
-
-
-    class Function_Client(jm.JobManager_Client):
-        @staticmethod
-        def func(arg, const_arg, c, m):
-            f = const_arg['f']
-            args, kwargs = arg
-            return f(*args, **kwargs)
-
-    class Cache_Server(jm.JobManager_Server):
-        def __init__(self,
-                     func,
-                     db_name,
-                     db_path,
-                     subdbkey,
-                     PDS,
-                     authkey      = DEFAULT_AUTHKEY,
-                     port         = DEFAULT_PORT,
-                     **kwargs_cache_server):
-
-            jm.JobManager_Server.__init__(self,
-                                          authkey,
-                                          const_arg    = {'f': func},
-                                          port         = port,
-                                          fname_dump   = None,
-                                          **kwargs_cache_server)
-            self.func = func
-            self.db_name = db_name
-            self.db_path = db_path
-            self.subdbkey = subdbkey
-            self.PDS = PDS
-
-        @staticmethod
-        def _start_client(server,
-                          authkey,
-                          port,
-                          nproc,
-                          nice,
-                          show_statusbar_for_jobs,
-                          show_counter_only):               
-
-            client = Function_Client(server  = server,
-                                     authkey = authkey,
-                                     port    = port,
-                                     nproc   = nproc,
-                                     nice    = nice,
-                                     show_statusbar_for_jobs = show_statusbar_for_jobs,
-                                     show_counter_only       = show_counter_only,
-                                     use_special_SIG_INT_handler = False)   # maps SIGINT to exit
-
-#             fname = "{}_pid_{}.out".format(datetime.datetime.now().isoformat(), os.getpid())
-#             jml = jm.jobmanager.log
-#             print(jml.name)   
-#             jml.setLevel(logging.DEBUG)
-#             for h in jml.handlers:
-#                 jml.removeHandler(h)
-#             fhandl = logging.FileHandler(fname)
-#             fhandl.setLevel(logging.DEBUG)
-#             jml.addHandler(fhandl)
-            
-            client.start()
-
-
-        def process_new_result(self, arg, result):
-            args, kwargs = arg
-            callargs = inspect.getcallargs(self.func, *args, **kwargs)
-            key = binfootprint.dump(callargs)
-            with self.PDS(name=self.db_name, path=self.db_path) as db:
-                if self.subdbkey is not None:
-                    with db.getData(self.subdbkey, create_sub_data=True) as subdb:
-                        subdb[key] = result
-                else:
-                    db[key] = result
-
-
-        def put_arg(self, args, kwargs):
-            callargs = inspect.getcallargs(self.func, *args, **kwargs)
-            key = binfootprint.dump(callargs)
-
-            with self.PDS(name=self.db_name, path=self.db_path) as db:
-                if self.subdbkey is not None:
-                    with db.getData(self.subdbkey, create_sub_data=True) as subdb:
-                        if key in subdb:
-                            return subdb[key]
-                else:
-                    if key in db:
-                        return db[key]
-
-            arg = (args, kwargs)
-            jm.JobManager_Server.put_arg(self, arg)
-            return None
-
-except ImportError:
-    warnings.warn("could not import jobmanager (pd_func_cache.call_list will not work)")
-    HAS_JOBMANAGER = False
-
+raise DeprecationWarning("the decorators module is not supported anymore! check out the 'mppfc' package instead.")
 
 def pd_func_cache(db_name=None, db_path='.', kind='sql', subdbkey=None, verbose=0):
     class pd_func_cache_decorator:

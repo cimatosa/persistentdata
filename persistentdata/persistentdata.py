@@ -1,7 +1,3 @@
-# -*- coding: utf-8 -*-
-
-from __future__ import division, print_function
-
 import sqlitedict as sqd
 import h5py
 import hashlib
@@ -9,7 +5,6 @@ from os.path import abspath, join, exists
 import os
 import sys
 import shutil
-import traceback
 import pickle
 import warnings
 import random
@@ -27,25 +22,6 @@ try:
 except ImportError:
     warnings.warn("could not import 'numpy', I can not treat np.ndarray separately!")
     _NP = False
-    
-
-if sys.version_info[0] == 2:
-    # fixes keyword problems with python 2.x
-    os_remove = os.remove
-    def new_remove(path):
-        os_remove(path)
-    os.remove = new_remove
-    
-    os_rmdir = os.rmdir
-    def new_rmdir(path):
-        os_rmdir(path)
-    os.rmdir = new_rmdir
-    
-    os_rename = os.rename
-    def new_rename(src, dst):
-        os_rename(src, dst)
-    os.rename = new_rename
-    
 
 MAGIC_SIGN = 0xff4a87
 MAGIC_SIGN_NPARRAY = 0xee4a87
@@ -618,6 +594,8 @@ class PersistentDataStructure_HDF5(object):
                 print("create path")
                 os.makedirs(self._path)
             self._filename = join(self._path, self._name + '.hdf5')
+            if self.verbose > 1:
+                print("init with is_group:{}, filename:{}".format(self._is_group, self._filename))
             self.open()
         else:
             self._is_group = True
@@ -750,7 +728,7 @@ class PersistentDataStructure_HDF5(object):
             
     def __dataset_to_object(self, dataset):    
         if isinstance(dataset, h5py.Dataset):                   
-            data = dataset.value
+            data = dataset[()]
             if dataset.attrs['pickle'] == True:
                 return pickle.loads(data)
             else:
@@ -836,7 +814,7 @@ class PersistentDataStructure_HDF5(object):
 
     def open(self):
         if not self._is_group:
-            self.db = h5py.File(self._filename)
+            self.db = h5py.File(self._filename, mode='a')
             if self.verbose > 1:
                 print("open", self._filename)
         self._open = True

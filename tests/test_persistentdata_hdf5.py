@@ -23,7 +23,7 @@ warnings.filterwarnings('error')
 warnings.filterwarnings(action = "once",
                         category= DeprecationWarning)
 
-VERBOSE = 1
+VERBOSE = 2
 
 def test_md5_clash():
     data = None

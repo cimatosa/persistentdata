@@ -1,0 +1,32 @@
+[tool.poetry]
+name = "persistentdata"
+version = "0.0.1"
+description = "A hierarchical persistent data structure with key-value interface."
+authors = ["Richard Hartmann <richard.hartmann@tu-dresden.de>"]
+license = "MIT"
+classifiers = [
+    "Operating System :: OS Independent",
+    "License :: OSI Approved :: MIT License",
+    "Topic :: Utilities",
+    "Topic :: Software Development :: Libraries",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Developers"
+]
+repository = "https://github.com/cimatosa/persistentdata"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+binfootprint = "^1.2.0"
+sqlitedict = "^2.1.0"
+h5py = "^3.9.0"
+progression = "^0.1.4"
+
+[tool.poetry.dev-dependencies]
+pytest = "^7.0.0"
+black = ">22.0.0"
+
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
