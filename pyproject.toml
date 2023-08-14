@@ -19,7 +19,7 @@ readme = "README.md"
 python = "^3.9"
 binfootprint = "^1.2.0"
 sqlitedict = "^2.1.0"
-h5py = "^3.9.0"
+#h5py = "^3.9.0"
 progression = "^0.1.4"
 
 [tool.poetry.dev-dependencies]
