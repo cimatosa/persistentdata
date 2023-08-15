@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "persistentdata"
-version = "0.1.0"
+version = "0.1.1"
 description = "A hierarchical persistent data structure with key-value interface."
 authors = ["Richard Hartmann <richard.hartmann@tu-dresden.de>"]
 license = "MIT"
@@ -20,7 +20,7 @@ python = "^3.9"
 binfootprint = "^1.2.0"
 sqlitedict = "^2.1.0"
 #h5py = "^3.9.0"
-progression = "^0.1.4"
+progression = "^0.2.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.0.0"
